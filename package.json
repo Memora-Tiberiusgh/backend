@@ -1,0 +1,38 @@
+{
+  "name": "memora-back-end",
+  "version": "1.0.0",
+  "description": "The back-end of the Memora application, a web-based memory training tool.",
+  "author": "Tiberius Gherac",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon --inspect --env-file=.env src/server.js",
+    "lint": "npx eslint ./src || exit 0",
+    "lint:fix": "npx eslint ./src --fix || exit 0"
+  },
+  "contributors": [
+    "Tiberius Gherac <tg222hh@student.lnu.se>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@lnu/json-js-cycle": "^2.0.5",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-http-context": "^2.0.0",
+    "express-session": "^1.17.3",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.0.4",
+    "morgan": "^1.10.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@lnu/eslint-config": "^1.1.10",
+    "nodemon": "^3.0.2"
+  }
+}
