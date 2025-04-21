@@ -7,7 +7,9 @@
 
 import express from "express"
 import { router as userRouter } from "./userRouter.js"
+import { router as collectionRouter } from "./collectionRouter.js"
 
 export const router = express.Router()
 
-router.use("/", userRouter)
+router.use("/users", userRouter)
+router.use("/collection", collectionRouter)

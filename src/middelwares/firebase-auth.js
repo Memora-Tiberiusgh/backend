@@ -1,5 +1,5 @@
 // src/middlewares/firebase-auth.js
-import { auth } from "../services/firebase.js"
+import { admin } from "../services/firebase.js"
 import { logger } from "../config/winston.js"
 
 /**
@@ -17,17 +17,21 @@ export const verifyFirebaseToken = async (req, res, next) => {
       return res.status(401).json({ error: "Unauthorized" })
     }
 
-    const token = authHeader.split(" ")[1]
+    const token = authHeader.split("Bearer ")[1]
 
     // Verify the token with Firebase
-    const decodedToken = await auth.verifyIdToken(token)
+    const decodedToken = await admin.auth().verifyIdToken(token)
 
-    // Add the user ID to the request
-    req.userId = decodedToken.uid
+    // Attach the user data to the request
+    req.user = {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      displayName: decodedToken.name,
+    }
 
     next()
   } catch (error) {
-    logger.error("Authentication error", { error })
-    res.status(401).json({ error: "Authentication failed" })
+    logger.error("Authentication error", { error: error.message })
+    next(error)
   }
 }

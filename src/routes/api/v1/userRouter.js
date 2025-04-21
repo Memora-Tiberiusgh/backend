@@ -16,6 +16,6 @@ router.post("/verify-token", async (req, res, next) =>
   controller.verifyToken(req, res, next)
 )
 
-router.post("/logout", async (req, res, next) =>
-  controller.logoutPost(req, res, next)
+router.post("/", async (req, res, next) =>
+  controller.createUserPost(req, res, next)
 )
