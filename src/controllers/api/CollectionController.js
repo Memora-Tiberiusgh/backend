@@ -72,8 +72,22 @@ export class CollectionController {
       next(error)
     }
   }
-}
 
+  async collectionsGet(req, res, next) {
+    try {
+      const user = req.user
+
+      // Find collections that are either created by the current user OR are public
+      const collections = await CollectionModel.find({
+        $or: [{ creator: user._id }, { isPublic: true }],
+      })
+      res.status(200).json(collections)
+    } catch (error) {
+      logger.error(error.message)
+      next(error)
+    }
+  }
+}
 // const mockupData = [
 //   {
 //     id: 1,
