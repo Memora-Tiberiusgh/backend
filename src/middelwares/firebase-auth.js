@@ -1,6 +1,8 @@
 // src/middlewares/firebase-auth.js
 import { admin } from "../services/firebase.js"
 import { logger } from "../config/winston.js"
+import mongoose from "mongoose"
+import "../models/UserModel.js"
 
 /**
  * Middleware to verify Firebase authentication tokens.
@@ -22,12 +24,15 @@ export const verifyFirebaseToken = async (req, res, next) => {
     // Verify the token with Firebase
     const decodedToken = await admin.auth().verifyIdToken(token)
 
-    // Attach the user data to the request
-    req.user = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      displayName: decodedToken.name,
+    // Find the MongoDB user by Firebase UID
+    const user = await mongoose.model("User").findOne({ uid: decodedToken.uid })
+
+    if (!user) {
+      return res.status(401).json({ error: "User not found in database" })
     }
+
+    // Attach the user data to the request
+    req.user = user
 
     next()
   } catch (error) {
