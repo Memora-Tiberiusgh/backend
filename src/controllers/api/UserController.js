@@ -14,7 +14,13 @@ import { UserModel } from "../../models/UserModel.js"
 export class UserController {
   async createUserPost(req, res, next) {
     try {
-      const { uid, displayName, email } = req.user
+      // Get data from request body here since we only attach it to the req.user after this part
+      const { uid, displayName, email } = req.body
+
+      if (!uid) {
+        return res.status(400).json({ error: "Missing required field: uid" })
+      }
+
       // Check if user already exists
       let user = await UserModel.findOne({ firebaseUid: uid })
 

@@ -8,8 +8,9 @@
 import express from "express"
 import { router as userRouter } from "./userRouter.js"
 import { router as collectionRouter } from "./collectionRouter.js"
+import { verifyFirebaseToken } from "./../../../middelwares/firebase-auth.js"
 
 export const router = express.Router()
 
 router.use("/users", userRouter)
-router.use("/collection", collectionRouter)
+router.use("/collection", verifyFirebaseToken, collectionRouter)

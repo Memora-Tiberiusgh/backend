@@ -15,3 +15,7 @@ const controller = new CollectionController()
 router.get("/", async (req, res, next) =>
   controller.collectionsGet(req, res, next)
 )
+
+router.post("/", async (req, res, next) =>
+  controller.createCollection(req, res, next)
+)

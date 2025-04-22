@@ -25,7 +25,9 @@ export const verifyFirebaseToken = async (req, res, next) => {
     const decodedToken = await admin.auth().verifyIdToken(token)
 
     // Find the MongoDB user by Firebase UID
-    const user = await mongoose.model("User").findOne({ uid: decodedToken.uid })
+    const user = await mongoose
+      .model("User")
+      .findOne({ firebaseUid: decodedToken.uid })
 
     if (!user) {
       return res.status(401).json({ error: "User not found in database" })
