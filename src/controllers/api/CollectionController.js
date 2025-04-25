@@ -15,14 +15,7 @@ import { CollectionModel } from "../../models/CollectionModel.js"
  */
 const handleValidationError = (error) => {
   if (error.name === "ValidationError") {
-    const errors = {}
-
-    // Extract specific validation error messages from the model
-    Object.keys(error.errors).forEach((field) => {
-      errors[field] = error.errors[field].message
-    })
-
-    return errors
+    return error.message
   }
 
   return { error: error.message }
@@ -32,6 +25,25 @@ const handleValidationError = (error) => {
  * Encapsulates a controller.
  */
 export class CollectionController {
+  async loadCollectionDocument(req, res, next, collectionId) {
+    try {
+      const user = req.user
+
+      // Find the collection that either belongs to the user or is public
+      const collection = await CollectionModel.findOne({
+        _id: collectionId,
+        $or: [{ creator: user._id }, { isPublic: true }],
+      })
+
+      // Attach the collection to the request object
+      req.collection = collection
+      next()
+    } catch (error) {
+      logger.error(error.message)
+      next(error)
+    }
+  }
+
   /**
    * Create a new collection
    *
@@ -41,13 +53,12 @@ export class CollectionController {
    */
   async createCollection(req, res, next) {
     try {
-      const { name, description, isPublic } = req.body
+      const { name, description } = req.body
 
       // Create new collection with user information
       const collection = new CollectionModel({
         name,
         description,
-        isPublic,
         creator: req.user,
       })
 
@@ -68,7 +79,6 @@ export class CollectionController {
       if (error.name === "ValidationError") {
         return res.status(400).json(handleValidationError(error))
       }
-
       next(error)
     }
   }
@@ -79,7 +89,7 @@ export class CollectionController {
 
       // Find collections that are either created by the current user OR are public
       const collections = await CollectionModel.find({
-        $or: [{ creator: user._id }, { isPublic: true }],
+        $or: [{ creator: user.id }, { isPublic: true }],
       })
       res.status(200).json(collections)
     } catch (error) {
@@ -87,96 +97,65 @@ export class CollectionController {
       next(error)
     }
   }
+
+  // Update a collection
+  async updateCollection(req, res, next) {
+    try {
+      // No need to check if the request is from the creator here since i do that when i load the document and attach it to the request
+      const collection = req.collection
+      const { name, description } = req.body
+
+      // Update only the fields that were provided
+      if (name !== undefined) collection.name = name
+      collection.description = description
+
+      await collection.save()
+
+      res.status(200).json(collection)
+    } catch (error) {
+      logger.error(error.message)
+      next(error)
+    }
+  }
+
+  // Delete a collection
+  async deleteCollection(req, res, next) {
+    try {
+      //:TODO: Even delete the flascards associated with this collection
+      //   await FlashcardModel.deleteMany({ collectionId: collection._id });
+
+      // No need to check if the request is from the creator here since i do that when i load the document and attach it to the request
+
+      // Delete the collection
+      await req.collection.deleteOne()
+
+      res.status(204).send()
+    } catch (error) {
+      logger.error(error.message)
+      next(error)
+    }
+  }
+
+  /**
+   * Get a single collection by ID
+   *
+   * @param {object} req - Express request object
+   * @param {object} res - Express response object
+   * @param {function} next - Express next middleware function
+   */
+  async getCollection(req, res, next) {
+    try {
+      if (!req.collection) {
+        return res.status(404).json({ message: "Collection not found" })
+      }
+
+      res.status(200).json(req.collection)
+    } catch (error) {
+      logger.error("Error retrieving collection", {
+        error: error.message,
+        stack: error.stack,
+      })
+      next(error)
+    }
+  }
 }
-// const mockupData = [
-//   {
-//     id: 1,
-//     name: "Swedish Basics",
-//     isPublic: false,
-//     cards: [
-//       { question: "Hur säger man 'hello' på svenska?", answer: "Hej" },
-//       { question: "Vad är 'thank you' på svenska?", answer: "Tack" },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     name: "French Vocabulary",
-//     isPublic: false,
-//     cards: [
-//       {
-//         question: "Comment dit-on 'hello' en français?",
-//         answer: "Bonjour",
-//       },
-//       {
-//         question: "Comment dit-on 'thank you' en français?",
-//         answer: "Merci",
-//       },
-//     ],
-//   },
-//   {
-//     id: 3,
-//     name: "JavaScript Fundamentals",
-//     isPublic: false,
-//     cards: [
-//       {
-//         question: "What is a closure in JavaScript?",
-//         answer:
-//           "A function that has access to its own scope, the outer function's scope, and the global scope",
-//       },
-//       {
-//         question: "Hur loggar man i consolen i JavaScript?",
-//         answer: "Man frågar chatGPT",
-//       },
-//       {
-//         question: "What is the difference between let and var?",
-//         answer: "let is block-scoped, var is function-scoped",
-//       },
-//     ],
-//   },
-//   {
-//     id: 4,
-//     name: "AI Prompt Engineering",
-//     isPublic: true,
-//     cards: [
-//       {
-//         question: "What is a prompt?",
-//         answer: "Instructions given to an AI to guide its output",
-//       },
-//       {
-//         question: "What is temperature in AI?",
-//         answer: "A parameter that controls randomness in generation",
-//       },
-//     ],
-//   },
-//   {
-//     id: 5,
-//     name: "Computer Science",
-//     isPublic: false,
-//     cards: [
-//       {
-//         question: "What is a data structure?",
-//         answer: "A specialized format for organizing and storing data",
-//       },
-//       {
-//         question: "What is an algorithm?",
-//         answer: "A step-by-step procedure for solving a problem",
-//       },
-//     ],
-//   },
-//   {
-//     id: 6,
-//     name: "Programming Tips",
-//     isPublic: true,
-//     cards: [
-//       {
-//         question: "What is DRY?",
-//         answer: "Don't Repeat Yourself - a principle to reduce repetition",
-//       },
-//       {
-//         question: "What is SOLID?",
-//         answer:
-//           "Five design principles for OOP: Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion",
-//       },
-//     ],
-//   },
-// ]
