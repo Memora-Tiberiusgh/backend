@@ -7,6 +7,7 @@
 
 import { logger } from "../../config/winston.js"
 import { CollectionModel } from "../../models/CollectionModel.js"
+import { FlashcardModel } from "../../models/FlashcardModel.js"
 
 /**
  * Handles validation errors from Mongoose
@@ -18,7 +19,7 @@ const handleValidationError = (error) => {
     return error.message
   }
 
-  return { error: error.message }
+  return error.message
 }
 
 /**
@@ -114,6 +115,11 @@ export class CollectionController {
       res.status(200).json(collection)
     } catch (error) {
       logger.error(error.message)
+
+      if (error.name === "ValidationError") {
+        return res.status(400).json(handleValidationError(error))
+      }
+
       next(error)
     }
   }
@@ -121,10 +127,10 @@ export class CollectionController {
   // Delete a collection
   async deleteCollection(req, res, next) {
     try {
-      //:TODO: Even delete the flascards associated with this collection
-      //   await FlashcardModel.deleteMany({ collectionId: collection._id });
+      //Even delete the flascards associated with this collection
 
       // No need to check if the request is from the creator here since i do that when i load the document and attach it to the request
+      await FlashcardModel.deleteMany({ collectionId: req.collection._id })
 
       // Delete the collection
       await req.collection.deleteOne()
