@@ -227,7 +227,7 @@ export class FlashcardController {
       // Verify the collection exists and user has access to it
       const collection = await CollectionModel.findOne({
         _id: collectionId,
-        $or: [{ creator: user._id }, { isPublic: true }],
+        $or: [{ creator: user }, { isPublic: true }],
       })
 
       if (!collection) {
