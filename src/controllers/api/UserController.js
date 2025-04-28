@@ -7,6 +7,7 @@
 
 import { logger } from "../../config/winston.js"
 import { UserModel } from "../../models/UserModel.js"
+import xss from "xss"
 
 /**
  * Encapsulates a controller.
@@ -29,8 +30,8 @@ export class UserController {
         logger.info("Creating new user", { uid })
         user = new UserModel({
           firebaseUid: uid,
-          displayName,
-          email,
+          displayName: xss(displayName),
+          email: xss(email),
         })
 
         await user.save()

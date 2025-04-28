@@ -8,6 +8,7 @@
 import { logger } from "../../config/winston.js"
 import { FlashcardModel } from "../../models/FlashcardModel.js"
 import { CollectionModel } from "../../models/CollectionModel.js"
+import xss from "xss"
 
 /**
  * Handles validation errors from Mongoose
@@ -98,8 +99,8 @@ export class FlashcardController {
 
       // Create new flashcard
       const flashcard = new FlashcardModel({
-        question,
-        answer,
+        question: xss(question),
+        answer: xss(answer),
         collectionId,
         creator: user,
       })
@@ -163,8 +164,8 @@ export class FlashcardController {
       }
 
       // Update only the fields that were provided
-      if (question !== undefined) flashcard.question = question
-      if (answer !== undefined) flashcard.answer = answer
+      if (question !== undefined) flashcard.question = xss(question)
+      if (answer !== undefined) flashcard.answer = xss(answer)
 
       await flashcard.save()
 

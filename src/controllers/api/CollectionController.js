@@ -8,6 +8,7 @@
 import { logger } from "../../config/winston.js"
 import { CollectionModel } from "../../models/CollectionModel.js"
 import { FlashcardModel } from "../../models/FlashcardModel.js"
+import xss from "xss"
 
 /**
  * Handles validation errors from Mongoose
@@ -58,8 +59,8 @@ export class CollectionController {
 
       // Create new collection with user information
       const collection = new CollectionModel({
-        name,
-        description,
+        name: xss(name),
+        description: description ? xss(description) : undefined,
         creator: req.user,
       })
 
@@ -107,8 +108,8 @@ export class CollectionController {
       const { name, description } = req.body
 
       // Update only the fields that were provided
-      if (name !== undefined) collection.name = name
-      collection.description = description
+      if (name !== undefined) collection.name = xss(name)
+      if (description !== undefined) collection.description = xss(description)
 
       await collection.save()
 
