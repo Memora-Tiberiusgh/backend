@@ -33,18 +33,7 @@ const schema = new mongoose.Schema({
   },
 })
 
-// Add virtual property to get related flashcards
-collectionSchema.virtual("cards", {
-  ref: "Flashcard",
-  localField: "_id",
-  foreignField: "collectionId",
-})
-
-// Make virtuals available when converting to JSON
-collectionSchema.set("toJSON", { virtuals: true })
-collectionSchema.set("toObject", { virtuals: true })
-
 // Add base schema
-collectionSchema.add(BASE_SCHEMA)
+schema.add(BASE_SCHEMA)
 
-export const CollectionModel = mongoose.model("Collection", collectionSchema)
+export const CollectionModel = mongoose.model("Collection", schema)
