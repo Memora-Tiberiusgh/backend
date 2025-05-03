@@ -26,7 +26,7 @@ router.post("/", async (req, res, next) =>
 )
 
 router.get("/:collectionId", async (req, res, next) =>
-  controller.loadCollectionDocument(req, res, next)
+  controller.getCollection(req, res, next)
 )
 router.patch("/:collectionId", async (req, res, next) =>
   controller.updateCollection(req, res, next)

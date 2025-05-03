@@ -4,12 +4,12 @@
   "description": "The back-end of the Memora application, a web-based memory training tool.",
   "author": "Tiberius Gherac",
   "type": "module",
-  "main": "src/server.js",
+  "main": "./src/server.js",
   "engines": {
     "node": ">=20.6.0"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node ./src/server.js",
     "dev": "nodemon --inspect --env-file=.env src/server.js",
     "lint": "npx eslint ./src || exit 0",
     "lint:fix": "npx eslint ./src --fix || exit 0"
