@@ -14,11 +14,13 @@ test:
 build:
   stage: build
   image: docker:latest
-  services:
-    - name: docker:dind
   variables:
-    DOCKER_TLS_CERTDIR: ""  # Disable TLS for simplicity
+    DOCKER_DRIVER: overlay2
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # Use GitLab's predefined CI/CD variables
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:latest
+  # Tell GitLab this job needs access to the Docker socket
+  tags:
+    - docker
