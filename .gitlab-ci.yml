@@ -10,16 +10,15 @@ test:
     - echo "Running extremely simple test"
     - npm run test
     - echo "Test passed successfully!"
-  only:
-    - main
 
 build:
   stage: build
-  image: node:20.6
+  image: docker:20.6
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
   script:
-    - npm install
-    - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:latest
-  only:
-    - main
