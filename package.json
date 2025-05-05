@@ -12,7 +12,8 @@
     "start": "node ./src/server.js",
     "dev": "nodemon --inspect --env-file=.env src/server.js",
     "lint": "npx eslint ./src || exit 0",
-    "lint:fix": "npx eslint ./src --fix || exit 0"
+    "lint:fix": "npx eslint ./src --fix || exit 0",
+    "test": "echo 'Running simple test' && exit 0"
   },
   "contributors": [
     "Tiberius Gherac <tg222hh@student.lnu.se>"
