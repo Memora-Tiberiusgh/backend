@@ -1,0 +1,35 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  image: node:20.6
+  script:
+    - npm install
+    - echo "Running extremely simple test"
+    - npm run test
+    - echo "Test passed successfully!"
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:  # See https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"  
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}"      
+
+trigger_deploy:
+  stage: deploy
+  trigger:
+    project: 1dv613/student/tg222hh/memora/docker-compose-config
+    branch: main
+  only:
+    - main
+  needs:
+    - build
+      
