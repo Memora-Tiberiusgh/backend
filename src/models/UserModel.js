@@ -26,6 +26,12 @@ const schema = new mongoose.Schema({
     lowercase: true,
     index: true,
   },
+  userAddedCollections: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Collection",
+    },
+  ],
 })
 
 schema.add(BASE_SCHEMA)
