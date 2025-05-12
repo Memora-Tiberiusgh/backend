@@ -25,6 +25,10 @@ router.post("/", async (req, res, next) =>
   controller.createCollection(req, res, next)
 )
 
+router.get("/public", async (req, res, next) =>
+  controller.getPublicCollections(req, res, next)
+)
+
 router.get("/:collectionId", async (req, res, next) =>
   controller.getCollection(req, res, next)
 )
@@ -33,4 +37,8 @@ router.patch("/:collectionId", async (req, res, next) =>
 )
 router.delete("/:collectionId", async (req, res, next) =>
   controller.deleteCollection(req, res, next)
+)
+
+router.post("/:collectionId/submit", async (req, res, next) =>
+  controller.submitForPublic(req, res, next)
 )
