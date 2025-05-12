@@ -31,6 +31,7 @@ const schema = new mongoose.Schema({
     ref: "User",
     required: [true, "Collection must belong to a user"],
   },
+  submitted: { type: Boolean, default: false },
 })
 
 // Add base schema

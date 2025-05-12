@@ -14,6 +14,7 @@ import { logger } from "./config/winston.js"
 import { router } from "./routes/router.js"
 import { errorHandler } from "./middelwares/error-handler.js"
 import { requestUUIDMiddleware } from "./middelwares/request-uuid.js"
+import cors from "cors"
 
 try {
   // Connect to MongoDB.
@@ -24,6 +25,19 @@ try {
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet())
+
+  //REMOVE
+  // Configure CORS based on environment
+  if (process.env.NODE_ENV === "development") {
+    // For development: Allow requests from development frontend
+    app.use(
+      cors({
+        origin: "*",
+        credentials: true,
+      })
+    )
+    logger.info("CORS configured for development environment")
+  }
 
   // Parse requests of the content type application/json.
   app.use(express.json())

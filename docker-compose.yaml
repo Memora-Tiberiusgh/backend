@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: memora-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - memora-network
+    restart: unless-stopped
+
+  backend:
+    image: memora-backend
+    container_name: memora-backend
+    env_file:
+      - .env
+    environment:
+      - PORT=8186
+      - DB_CONNECTION_STRING=mongodb://mongodb:27017/memora
+    ports:
+      - "8186:8186"
+    depends_on:
+      - mongodb
+    networks:
+      - memora-network
+    restart: unless-stopped
+
+networks:
+  memora-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

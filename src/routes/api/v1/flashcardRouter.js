@@ -34,6 +34,6 @@ router.delete("/:flashcardId", async (req, res, next) =>
 )
 
 // Get all flashcards for a specific collection
-router.get("/collection/:collectionId", async (req, res, next) =>
+router.get("/collections/:collectionId", async (req, res, next) =>
   controller.getFlashcardsByCollection(req, res, next)
 )

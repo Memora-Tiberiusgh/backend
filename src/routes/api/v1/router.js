@@ -14,5 +14,5 @@ import { verifyFirebaseToken } from "./../../../middelwares/firebase-auth.js"
 export const router = express.Router()
 
 router.use("/users", userRouter)
-router.use("/collection", verifyFirebaseToken, collectionRouter)
+router.use("/collections", verifyFirebaseToken, collectionRouter)
 router.use("/flashcards", verifyFirebaseToken, flashcardRouter)
