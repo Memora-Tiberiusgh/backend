@@ -27,11 +27,18 @@ export class UserController {
       let user = await UserModel.findOne({ firebaseUid: uid })
 
       if (!user) {
-        // Two public collections that will be assigned to each new user
-        const defaultCollectionIds = [
-          "68162434eb00990068571c55",
-          "681f113501be6d322360b462",
-        ]
+        // Names of default public collections that will be assigned to each new user
+        const defaultCollectionNames = ["Swedish 🇸🇪", "French 🇫🇷"]
+
+        // Find the collections by name and make sure they're public
+        const defaultCollections = await CollectionModel.find({
+          name: { $in: defaultCollectionNames },
+          isPublic: true,
+        })
+
+        const defaultCollectionIds = defaultCollections.map(
+          (collection) => collection._id
+        )
 
         // Create new user if doesn't exist
         logger.info("Creating new user", { uid })
