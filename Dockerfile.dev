@@ -1,0 +1,17 @@
+FROM node:23-alpine3.20
+
+WORKDIR /backend
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy application code including .env
+COPY . .
+
+EXPOSE 8186
+
+# Use nodemon for development if you have it, otherwise npm start
+CMD ["npm", "run", "dev"]
