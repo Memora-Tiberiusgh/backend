@@ -57,7 +57,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          dockerfile: ./Dockerfile
+          dockerfile: ./Dockerfile.dev
+          no-cache: true
           push: true
           tags: |
             ghcr.io/${{ steps.repo.outputs.repository }}:latest
@@ -78,7 +79,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.DEPLOY_TOKEN }}
-          repository: YOUR_ORG/orchestrator-repo
+          repository: Memora-Tiberiusgh/orchestrator
           event-type: backend-updated
           client-payload: |
             {
