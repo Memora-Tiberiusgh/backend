@@ -5,21 +5,21 @@
  * @version 1.0.0
  */
 
-import { logger } from "../../config/winston.js"
-import { FlashcardModel } from "../../models/FlashcardModel.js"
-import { CollectionModel } from "../../models/CollectionModel.js"
-import xss from "xss"
+import { logger } from '../../config/winston.js'
+import { FlashcardModel } from '../../models/FlashcardModel.js'
+import { CollectionModel } from '../../models/CollectionModel.js'
+import xss from 'xss'
 
 /**
- * Handles validation errors from Mongoose
- * @param {Error} error - The error object
- * @returns {Object} Formatted error messages
+ * Handles validation errors by returning the error message.
+ *
+ * @param {Error} error - The error object to handle.
+ * @returns {string} The error message.
  */
 const handleValidationError = (error) => {
-  if (error.name === "ValidationError") {
+  if (error.name === 'ValidationError') {
     return error.message
   }
-
   return error.message
 }
 
@@ -28,12 +28,13 @@ const handleValidationError = (error) => {
  */
 export class FlashcardController {
   /**
-   * Loads a flashcard document and attaches it to the request object
+   * Loads a flashcard document and verifies user permissions before attaching to request.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
-   * @param {string} flashcardId - ID of the flashcard to load
+   * @param {Function} next - Express next middleware function
+   * @param {string} flashcardId - The flashcard ID from route parameters
+   * @returns {Promise<void>}
    */
   async loadFlashcardDocument(req, res, next, flashcardId) {
     try {
@@ -43,7 +44,7 @@ export class FlashcardController {
       const flashcard = await FlashcardModel.findById(flashcardId)
 
       if (!flashcard) {
-        return res.status(404).json({ message: "Flashcard not found" })
+        return res.status(404).json({ message: 'Flashcard not found' })
       }
 
       // Find the collection to check if it's public or belongs to the user
@@ -52,14 +53,14 @@ export class FlashcardController {
       if (!collection) {
         return res
           .status(404)
-          .json({ message: "Associated collection not found" })
+          .json({ message: 'Associated collection not found' })
       }
 
       // Check if user has access to this flashcard through collection permissions
       if (!collection.isPublic && !collection.creator.equals(user.id)) {
         return res
           .status(403)
-          .json({ message: "Access denied to this flashcard" })
+          .json({ message: 'Access denied to this flashcard' })
       }
 
       // Attach the flashcard to the request object
@@ -71,11 +72,12 @@ export class FlashcardController {
   }
 
   /**
-   * Create a new flashcard
+   * Creates a new flashcard within a specified collection.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
+   * @param {Function} next - Express next middleware function
+   * @returns {Promise<void>}
    */
   async createFlashcard(req, res, next) {
     try {
@@ -86,14 +88,14 @@ export class FlashcardController {
       const collection = await CollectionModel.findById(collectionId)
 
       if (!collection) {
-        return res.status(404).json({ message: "Collection not found" })
+        return res.status(404).json({ message: 'Collection not found' })
       }
 
       // Check if user owns the collection
       if (!collection.creator.equals(user.id)) {
         return res.status(403).json({
           message:
-            "You can't create flashcard in collections that are not created by you",
+            "You can't create flashcard in collections that are not created by you"
         })
       }
 
@@ -102,21 +104,21 @@ export class FlashcardController {
         question: xss(question),
         answer: xss(answer),
         collectionId,
-        creator: user,
+        creator: user
       })
 
       await flashcard.save()
 
-      logger.info("Flashcard created successfully")
+      logger.info('Flashcard created successfully')
 
       res.status(201).json(flashcard)
     } catch (error) {
-      logger.error("Error creating flashcard", {
+      logger.error('Error creating flashcard', {
         error: error.message,
-        stack: error.stack,
+        stack: error.stack
       })
 
-      if (error.name === "ValidationError") {
+      if (error.name === 'ValidationError') {
         return res.status(400).json(handleValidationError(error))
       }
 
@@ -125,16 +127,17 @@ export class FlashcardController {
   }
 
   /**
-   * Get a specific flashcard
+   * Retrieves a specific flashcard by ID.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
+   * @param {Function} next - Express next middleware function
+   * @returns {Promise<void>}
    */
   async getFlashcard(req, res, next) {
     try {
       if (!req.flashcard) {
-        return res.status(404).json({ message: "Collection not found" })
+        return res.status(404).json({ message: 'Collection not found' })
       }
       // The flashcard is already loaded by the param middleware
       res.status(200).json(req.flashcard)
@@ -145,11 +148,12 @@ export class FlashcardController {
   }
 
   /**
-   * Update a flashcard
+   * Updates an existing flashcard's question and/or answer.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
+   * @param {Function} next - Express next middleware function
+   * @returns {Promise<void>}
    */
   async updateFlashcard(req, res, next) {
     try {
@@ -159,7 +163,7 @@ export class FlashcardController {
       // If flashcard was attached to the request (if the user is behörig)
       if (!flashcard) {
         return res.status(403).json({
-          message: "You don't have permission to edit this flashcard",
+          message: "You don't have permission to edit this flashcard"
         })
       }
 
@@ -169,13 +173,13 @@ export class FlashcardController {
 
       await flashcard.save()
 
-      logger.info(`Flashcard updated successfully`)
+      logger.info('Flashcard updated successfully')
 
       res.status(200).json(flashcard)
     } catch (error) {
       logger.error(`Error updating flashcard: ${error.message}`)
 
-      if (error.name === "ValidationError") {
+      if (error.name === 'ValidationError') {
         return res.status(400).json(handleValidationError(error))
       }
 
@@ -184,11 +188,12 @@ export class FlashcardController {
   }
 
   /**
-   * Delete a flashcard
+   * Deletes an existing flashcard.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
+   * @param {Function} next - Express next middleware function
+   * @returns {Promise<void>}
    */
   async deleteFlashcard(req, res, next) {
     try {
@@ -197,14 +202,14 @@ export class FlashcardController {
       // If flashcard was attached to the request (if the user is behörig)
       if (!flashcard) {
         return res.status(403).json({
-          message: "You don't have permission to delete this flashcard",
+          message: "You don't have permission to delete this flashcard"
         })
       }
 
       // Delete the flashcard
       await flashcard.deleteOne()
 
-      logger.info(`Flashcard deleted successfully`)
+      logger.info('Flashcard deleted successfully')
 
       res.status(204).send()
     } catch (error) {
@@ -214,11 +219,12 @@ export class FlashcardController {
   }
 
   /**
-   * Get all flashcards for a specific collection
+   * Retrieves all flashcards belonging to a specific collection.
    *
    * @param {object} req - Express request object
    * @param {object} res - Express response object
-   * @param {function} next - Express next middleware function
+   * @param {Function} next - Express next middleware function
+   * @returns {Promise<void>}
    */
   async getFlashcardsByCollection(req, res, next) {
     try {
@@ -228,11 +234,11 @@ export class FlashcardController {
       // Verify the collection exists and user has access to it
       const collection = await CollectionModel.findOne({
         _id: collectionId,
-        $or: [{ creator: user }, { isPublic: true }],
+        $or: [{ creator: user }, { isPublic: true }]
       })
 
       if (!collection) {
-        return res.status(404).json({ message: "Collection not found" })
+        return res.status(404).json({ message: 'Collection not found' })
       }
 
       // Fetch all flashcards for this collection

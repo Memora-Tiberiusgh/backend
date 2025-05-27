@@ -24,16 +24,24 @@ export const connectToDatabase = async (connectionString) => {
   mongoose.set('strictQuery', true)
 
   // Bind connection to events (to get notifications).
-  connection.on('connected', () => logger.info('Mongoose connected to MongoDB.'))
-  connection.on('error', (err) => logger.info(`Mongoose connection error: ${err}`))
-  connection.on('disconnected', () => logger.info('Mongoose disconnected from MongoDB.'))
+  connection.on('connected', () =>
+    logger.info('Mongoose connected to MongoDB.')
+  )
+  connection.on('error', (err) =>
+    logger.info(`Mongoose connection error: ${err}`)
+  )
+  connection.on('disconnected', () =>
+    logger.info('Mongoose disconnected from MongoDB.')
+  )
 
   // If the Node.js process ends, close the connection.
   for (const signalEvent of ['SIGINT', 'SIGTERM']) {
     process.on(signalEvent, () => {
-      (async () => {
+      ;(async () => {
         await connection.close()
-        logger.info(`Mongoose disconnected from MongoDB through ${signalEvent}.`)
+        logger.info(
+          `Mongoose disconnected from MongoDB through ${signalEvent}.`
+        )
         process.exit(0)
       })()
     })

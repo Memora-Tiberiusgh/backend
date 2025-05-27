@@ -52,7 +52,8 @@ const colorizeStatus = (status) => {
  */
 morgan.token('statusColor', (req, res, args) => {
   // Get the status code if response written.
-  const status = res.headersSent || Boolean(res.header) ? res.statusCode : undefined
+  const status =
+    res.headersSent || Boolean(res.header) ? res.statusCode : undefined
 
   return colorizeStatus(status)
 })
