@@ -4,17 +4,17 @@
  * @author Tiberius Gherac
  */
 
-import httpContext from "express-http-context" // Must be first!
-import "@lnu/json-js-cycle"
-import express from "express"
-import helmet from "helmet"
-import { connectToDatabase } from "./config/mongoose.js"
-import { morganLogger } from "./config/morgan.js"
-import { logger } from "./config/winston.js"
-import { router } from "./routes/router.js"
-import { errorHandler } from "./middelwares/error-handler.js"
-import { requestUUIDMiddleware } from "./middelwares/request-uuid.js"
-import cors from "cors"
+import httpContext from 'express-http-context' // Must be first!
+import '@lnu/json-js-cycle'
+import express from 'express'
+import helmet from 'helmet'
+import { connectToDatabase } from './config/mongoose.js'
+import { morganLogger } from './config/morgan.js'
+import { logger } from './config/winston.js'
+import { router } from './routes/router.js'
+import { errorHandler } from './middelwares/error-handler.js'
+import { requestUUIDMiddleware } from './middelwares/request-uuid.js'
+import cors from 'cors'
 
 try {
   // Connect to MongoDB.
@@ -26,17 +26,16 @@ try {
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet())
 
-  //REMOVE
   // Configure CORS based on environment
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     // For development: Allow requests from development frontend
     app.use(
       cors({
-        origin: "*",
-        credentials: true,
+        origin: '*',
+        credentials: true
       })
     )
-    logger.info("CORS configured for development environment")
+    logger.info('CORS configured for development environment')
   }
 
   // Parse requests of the content type application/json.
@@ -54,7 +53,7 @@ try {
   app.use(requestUUIDMiddleware)
 
   // Register routes.
-  app.use("/", router)
+  app.use('/', router)
 
   // Error handler.
   app.use(errorHandler)
@@ -62,7 +61,7 @@ try {
   // Starts the HTTP server listening for connections.
   const server = app.listen(process.env.PORT, () => {
     logger.info(`Server running at http://localhost:${server.address().port}`)
-    logger.info("Press Ctrl-C to terminate...")
+    logger.info('Press Ctrl-C to terminate...')
   })
 } catch (err) {
   logger.error(err.message, { error: err })

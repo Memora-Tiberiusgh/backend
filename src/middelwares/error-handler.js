@@ -24,12 +24,10 @@ export const errorHandler = (err, req, res, next) => {
 
     // Send only the error message and status code to prevent leakage of
     // sensitive information.
-    res
-      .status(err.status)
-      .json({
-        status: err.status,
-        message: err.message
-      })
+    res.status(err.status).json({
+      status: err.status,
+      message: err.message
+    })
 
     return res
   }
@@ -43,7 +41,5 @@ export const errorHandler = (err, req, res, next) => {
   // enumerable and non-enumrele properties (cyclical structures are handled).
   const copy = JSON.decycle(err, { includeNonEnumerableProperties: true })
 
-  return res
-    .status(err.status || 500)
-    .json(copy)
+  return res.status(err.status || 500).json(copy)
 }

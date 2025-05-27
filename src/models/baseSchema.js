@@ -21,7 +21,9 @@ const convertOptions = {
    * @see https://mongoosejs.com/docs/api.html#document_Document-toObject
    */
   transform: (doc, ret) => {
-    logger.silly('Transforming document', { doc: doc.toObject({ transform: false }) })
+    logger.silly('Transforming document', {
+      doc: doc.toObject({ transform: false })
+    })
     delete ret._id // Exclude the _id property.
     delete ret.creator // Exclude the creator property
     logger.silly('Transformed document', { ret })
@@ -30,18 +32,21 @@ const convertOptions = {
 }
 
 // Create a schema.
-const baseSchema = new mongoose.Schema({}, {
-  // Add and maintain createdAt and updatedAt fields.
-  timestamps: true,
-  // Set the options to use when converting the document to a POJO (or DTO) or JSON.
-  // POJO = Plain Old JavaScript Object
-  // DTO = Data Transfer Object
-  toObject: convertOptions,
-  toJSON: convertOptions,
-  // Enable optimistic concurrency control. This is a strategy to ensure the
-  // document you're updating didn't change between when you loaded it, and
-  // when you update it.
-  optimisticConcurrency: false
-})
+const baseSchema = new mongoose.Schema(
+  {},
+  {
+    // Add and maintain createdAt and updatedAt fields.
+    timestamps: true,
+    // Set the options to use when converting the document to a POJO (or DTO) or JSON.
+    // POJO = Plain Old JavaScript Object
+    // DTO = Data Transfer Object
+    toObject: convertOptions,
+    toJSON: convertOptions,
+    // Enable optimistic concurrency control. This is a strategy to ensure the
+    // document you're updating didn't change between when you loaded it, and
+    // when you update it.
+    optimisticConcurrency: false
+  }
+)
 
 export const BASE_SCHEMA = Object.freeze(baseSchema)

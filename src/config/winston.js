@@ -5,9 +5,9 @@
  * @version 1.0.0
  */
 
-import "@lnu/json-js-cycle"
-import httpContext from "express-http-context"
-import { addColors, createLogger, format, transports } from "winston"
+import '@lnu/json-js-cycle'
+import httpContext from 'express-http-context'
+import { addColors, createLogger, format, transports } from 'winston'
 
 // Destructuring assignment for convenience.
 const { colorize, combine, json, printf, timestamp } = format
@@ -17,13 +17,13 @@ const colorizer = colorize()
 
 // Adds colors to the colorizer.
 addColors({
-  info: "blue",
-  warn: "italic yellow",
-  error: "bold red",
-  http: "white",
-  debug: "magenta",
-  silly: "cyan",
-  verbose: "gray",
+  info: 'blue',
+  warn: 'italic yellow',
+  error: 'bold red',
+  http: 'white',
+  debug: 'magenta',
+  silly: 'cyan',
+  verbose: 'gray'
 })
 
 // Finds ANSI color sequences.
@@ -37,15 +37,15 @@ const defaultMetadata = {
    * @returns {object} The current request.
    */
   get request() {
-    const req = httpContext.get("request")
+    const req = httpContext.get('request')
     return {
       startTime: req?._startTime,
       requestUuid: req?.requestUuid,
       method: req?.method,
       url: req?.originalUrl,
       ip: req?.ip,
-      userAgent: req?.get("User-Agent"),
-      referer: req ? req.get("Referer") || "-" : undefined,
+      userAgent: req?.get('User-Agent'),
+      referer: req ? req.get('Referer') || '-' : undefined
     }
   },
 
@@ -55,7 +55,7 @@ const defaultMetadata = {
    * @returns {object} The current request's session ID.
    */
   get sessionId() {
-    const req = httpContext.get("request")
+    const req = httpContext.get('request')
     return req?.sessionID
   },
 
@@ -65,9 +65,9 @@ const defaultMetadata = {
    * @returns {object} The current request's user.
    */
   get user() {
-    const req = httpContext.get("request")
+    const req = httpContext.get('request')
     return req?.session?.user
-  },
+  }
 }
 
 /**
@@ -81,7 +81,7 @@ const isEmptyData = (value) => {
     return true
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value.trim().length === 0
   }
 
@@ -89,7 +89,7 @@ const isEmptyData = (value) => {
     return value.every(isEmptyData)
   }
 
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     return Object.values(value).every(isEmptyData)
   }
 
@@ -107,7 +107,7 @@ const metadataFormatter = format((info) => {
     // Deep copies the metadata object and returns a new object with
     // enumerable and non-enumerable properties (cyclical structures are handled).
     info.metadata = JSON.decycle(info.metadata, {
-      includeNonEnumerableProperties: true,
+      includeNonEnumerableProperties: true
     })
   }
 
@@ -115,7 +115,7 @@ const metadataFormatter = format((info) => {
   if (!Object.values(defaultMetadata).every(isEmptyData)) {
     info.metadata = {
       ...defaultMetadata,
-      ...info.metadata,
+      ...info.metadata
     }
   }
 
@@ -131,7 +131,7 @@ const metadataFormatter = format((info) => {
  * Removes ANSI color sequences from the message.
  */
 const decolorize = format((info) => {
-  info.message = info.message.replace(decolorizeRegex, "")
+  info.message = info.message.replace(decolorizeRegex, '')
   return info
 })
 
@@ -141,14 +141,14 @@ const decolorize = format((info) => {
 const baseFormat = combine(
   format.metadata(),
   metadataFormatter(),
-  timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" })
+  timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' })
 )
 
 /**
  * The logger.
  */
 export const logger = createLogger({
-  level: process.env.LOG_LEVEL || "http",
+  level: process.env.LOG_LEVEL || 'http',
   transports: [
     new transports.Console({
       format: combine(
@@ -157,30 +157,30 @@ export const logger = createLogger({
           let colorLevel = level
 
           // If the level is http, let the status code decide the color.
-          if (level === "http") {
-            const status = Number.parseInt(message.split(" ")[5])
+          if (level === 'http') {
+            const status = Number.parseInt(message.split(' ')[5])
 
             if (status >= 500) {
-              colorLevel = "error"
+              colorLevel = 'error'
             } else if (status >= 400) {
-              colorLevel = "warn"
+              colorLevel = 'warn'
             } else if (status >= 300) {
-              colorLevel = "verbose"
+              colorLevel = 'verbose'
             } else if (status >= 200) {
-              colorLevel = "http"
+              colorLevel = 'http'
             }
           }
 
           return colorizer.colorize(
             colorLevel,
             `[${timestamp}] ${level.toLocaleUpperCase()}: ${message} ${
-              metadata?.error?.stack ? `\n  ${metadata.error.stack}` : ""
+              metadata?.error?.stack ? `\n  ${metadata.error.stack}` : ''
             }`
           )
         })
-      ),
-    }),
-  ],
+      )
+    })
+  ]
 })
 
 // Add file transport if a path to the combined log file is provided.
@@ -189,7 +189,7 @@ if (process.env.LOGGER_COMBINED_LOG_FILE) {
     new transports.File({
       filename: process.env.LOGGER_COMBINED_LOG_FILE,
       decolorize: true,
-      format: combine(baseFormat, decolorize(), json()),
+      format: combine(baseFormat, decolorize(), json())
     })
   )
 }
@@ -199,9 +199,9 @@ if (process.env.LOGGER_ERROR_LOG_FILE) {
   logger.add(
     new transports.File({
       filename: process.env.LOGGER_ERROR_LOG_FILE,
-      level: "error",
+      level: 'error',
       decolorize: true,
-      format: combine(baseFormat, decolorize(), json()),
+      format: combine(baseFormat, decolorize(), json())
     })
   )
 }
@@ -210,28 +210,28 @@ if (process.env.LOGGER_ERROR_LOG_FILE) {
 if (process.env.LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE) {
   logger.exceptions.handle(
     new transports.File({
-      filename: process.env.LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE,
+      filename: process.env.LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE
     })
   )
 }
 
 // Add MongoDB transport if a connection string is provided.
 if (process.env.LOGGER_DB_CONNECTION_STRING) {
-  await import("winston-mongodb")
+  await import('winston-mongodb')
 
   logger.add(
     new transports.MongoDB({
-      level: "warn",
+      level: 'warn',
       db: process.env.LOGGER_DB_CONNECTION_STRING,
       options: {
         poolSize: 2,
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+        useUnifiedTopology: true
       },
-      collection: process.env.LOGGER_DB_COLLECTION_NAME || "logs",
+      collection: process.env.LOGGER_DB_COLLECTION_NAME || 'logs',
       capped: true,
       decolorize: true,
-      format: combine(baseFormat),
+      format: combine(baseFormat)
     })
   )
 }
@@ -241,7 +241,7 @@ if (process.env.LOGGER_SUBMISSIONS_LOG_FILE) {
   logger.add(
     new transports.File({
       filename: process.env.LOGGER_SUBMISSIONS_LOG_FILE,
-      level: "info",
+      level: 'info',
       decolorize: true,
       format: combine(
         baseFormat,
@@ -250,7 +250,7 @@ if (process.env.LOGGER_SUBMISSIONS_LOG_FILE) {
           // Only include logs with event: "collection_submission"
           if (
             info.metadata &&
-            info.metadata.event === "collection_submission"
+            info.metadata.event === 'collection_submission'
           ) {
             return info
           }
@@ -258,7 +258,7 @@ if (process.env.LOGGER_SUBMISSIONS_LOG_FILE) {
         })(),
         decolorize(),
         json()
-      ),
+      )
     })
   )
 }
