@@ -227,6 +227,10 @@ This project uses ESLint with LNU configuration for consistent code formatting.
 
 This project is licensed under the MIT License.
 
+## Support
+
+For issues and feature requests, please visit our [GitHub Discussions](https://github.com/orgs/Memora-Tiberiusgh/discussions) or contribute to the project at [GitHub organization](https://github.com/Memora-Tiberiusgh).
+
 ## Author
 
 **Tiberius Gherac** - [tiberius.gherac@gmail.com](mailto:tiberius.gherac@gmail.com)
