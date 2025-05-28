@@ -233,7 +233,7 @@ For issues and feature requests, please visit our [GitHub Discussions](https://g
 
 ## Author
 
-**Tiberius Gherac** - [tiberius.gherac@gmail.com](mailto:tiberius.gherac@gmail.com)
+**Tiberius Gherac** - [tiberius.gherac@gmail.com](mailto:tiberius.gherac@gmail.com)  
 First-year Web Development Student @ Linnaeus University  
 GitHub: [@TiberiusGh](https://github.com/TiberiusGh)
 
