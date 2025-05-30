@@ -2,7 +2,7 @@
 
 A robust Node.js backend API for the Memora flashcard application - a web-based memory training tool that helps users create, manage, and study flashcards.
 
-🌐 **Live Demo**: [memora.tiberiusgh.com](https://memora.tiberiusgh.com)
+🌐 **Live at**: [memora.tiberiusgh.com](https://memora.tiberiusgh.com)
 
 ## 🚀 Features
 
