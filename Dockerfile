@@ -19,8 +19,9 @@ COPY . .
 # Remove .env file if it exists (since it will be provided by compose)
 RUN rm -f .env
 
-# Change ownership to non-root user
-RUN chown -R backend:nodejs /backend
+# Create logs directory and set permissions BEFORE switching user
+RUN mkdir -p /backend/logs && \
+    chown -R backend:nodejs /backend
 
 # Switch to non-root user
 USER backend
